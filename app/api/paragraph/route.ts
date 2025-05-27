@@ -4,9 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const { title, content, tags } = await request.json();
+    const { title, content, tags, wordCount, charCount } = await request.json();
 
-    if (!title || !content) {
+    if (!title || !content || !wordCount || !charCount) {
       return NextResponse.json({ error: "Title and content are required" }, { status: 400 });
     }
 
@@ -20,6 +20,8 @@ export async function POST(request: NextRequest) {
       title,
       content,
       tags: tags || [],
+      wordCount,
+      charCount,
     });
 
     return NextResponse.json(newParagraph, { status: 201 });

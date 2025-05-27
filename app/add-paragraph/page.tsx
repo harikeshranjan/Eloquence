@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from 'react';
+import { toast } from 'sonner'
 
 export default function AddParagraph() {
   const [title, setTitle] = useState('');
@@ -71,16 +72,57 @@ export default function AddParagraph() {
   };
 
   // Handle save (placeholder for backend integration)
-  const handleSave = () => {
-    const paragraphData = {
-      title: title.trim(),
-      content: content.trim(),
-      tags: tags,
-      wordCount: wordCount,
-      charCount: charCount,
-    };
-    console.log('Saving paragraph:', paragraphData);
-    // Here you would typically send data to your backend
+  const handleSave = async () => {
+    try {
+      const paragraphData = {
+        title: title.trim(),
+        content: content.trim(),
+        tags: tags,
+        wordCount: wordCount,
+        charCount: charCount,
+      }
+
+      if (!paragraphData.title || !paragraphData.content) {
+        toast('Title and content are required to save the paragraph.', {
+          description: 'Please fill in both fields before saving.',
+          duration: 3000,
+        });
+        return;
+      }
+
+      let response = await fetch('/api/paragraph', {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(paragraphData),
+      })
+
+      if (!response.ok) {
+        toast('Failed to save paragraph', {
+          description: 'There was an error saving your paragraph. Please try again.',
+          duration: 3000,
+        });        
+      } else {
+        setTitle('');
+        setContent('');
+        setTags([]);
+        setWordCount(0);
+        setCharCount(0);
+        localStorage.removeItem('paragraph_draft');
+
+        toast('Paragraph saved successfully!', {
+          description: 'Your paragraph has been saved.',
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error('Error saving paragraph:', error);
+      toast('Error saving paragraph', {
+        description: 'An unexpected error occurred while saving your paragraph.',
+        duration: 3000,
+      });
+    }
   };
 
   // Handle draft save
@@ -244,30 +286,6 @@ export default function AddParagraph() {
             >
               Publish Paragraph
             </button>
-          </div>
-        </div>
-
-        {/* Writing Tips */}
-        <div className="mt-8 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-neutral-900 dark:to-neutral-800 rounded-2xl p-6 border border-blue-100 dark:border-neutral-700">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-3 flex items-center">
-            <svg className="w-5 h-5 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
-            Writing Tips
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
-            <div>
-              <strong className="text-gray-800 dark:text-gray-200">Clear Structure:</strong> Start with a clear topic sentence and develop your ideas logically.
-            </div>
-            <div>
-              <strong className="text-gray-800 dark:text-gray-200">Use Tags:</strong> Add relevant tags to make your paragraphs easily discoverable later.
-            </div>
-            <div>
-              <strong className="text-gray-800 dark:text-gray-200">Be Concise:</strong> Aim for clarity and impact. Every word should serve a purpose.
-            </div>
-            <div>
-              <strong className="text-gray-800 dark:text-gray-200">Save Often:</strong> Use the draft feature to preserve your work as you write.
-            </div>
           </div>
         </div>
       </div>
