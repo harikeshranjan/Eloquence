@@ -1,10 +1,15 @@
+"use client";
+
 import Link from "next/link"
 import ModeToggle from "./mode-toggle"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet"
 import { Button } from "./ui/button"
 import { Plus } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 function Navbar() {
+  const router = useRouter()
+
   return (
     <nav className="fixed top-0 w-full z-50 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md border-b border-gray-200/20 dark:border-neutral-700/20 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -40,6 +45,7 @@ function Navbar() {
             <Button
               variant={"secondary"}
               className="flex items-center justify-center cursor-pointer group bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold hover:from-blue-600 hover:to-purple-700 transform transition-all duration-300 shadow-lg hover:shadow-xl"
+              onClick={() => router.push("/add-paragraph")}
             >
               <Plus />
               Add
