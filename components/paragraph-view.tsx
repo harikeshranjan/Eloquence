@@ -16,9 +16,6 @@ interface Paragraph {
   category?: string;
 }
 
-// interface ParagraphViewProps {
-//   paragraph: Paragraph;
-// }
 export default function ParagraphView({ id }: { id: string }) {
   const [isEditing, setIsEditing] = useState(false);
   const [paragraph, setParagraph] = useState<Paragraph>({
@@ -36,7 +33,6 @@ export default function ParagraphView({ id }: { id: string }) {
   const router = useRouter();
 
   async function getParagraph(id: string) {
-    // Simulate API call - replace with your actual data fetching logic
     try {
       const response = await fetch(`/api/paragraph/${id}`, {
         method: 'GET',
@@ -87,7 +83,6 @@ export default function ParagraphView({ id }: { id: string }) {
 
   const handleEdit = () => {
     setIsEditing(true);
-    // Navigate to edit page or open edit modal
     router.push(`/paragraph/${paragraph.id}/edit`);
     console.log('Edit mode activated');
   };
@@ -121,6 +116,13 @@ export default function ParagraphView({ id }: { id: string }) {
     router.push('/paragraph');
   };
 
+  const calculateReadingTime = (content: string): string => {
+    const wordCount = content.trim().split(/\s+/).length;
+    const time = Math.ceil(wordCount / 200);
+
+    return time > 0 ? "< 1 min" : `${time} min`;
+  }
+
   return (
     <div className="min-h-screen px-4">
       <div className="max-w-4xl mx-auto">
@@ -136,7 +138,10 @@ export default function ParagraphView({ id }: { id: string }) {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <span>{paragraph.readingTime} min read</span>
+              <span>
+                {calculateReadingTime(paragraph.content)}
+              </span>
+
             </div>
             <div className="flex items-center space-x-2">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -244,7 +249,7 @@ export default function ParagraphView({ id }: { id: string }) {
               <div className="text-sm text-gray-600 dark:text-gray-400">Characters</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-500 mb-1">{paragraph.readingTime}</div>
+              <div className="text-2xl font-bold text-purple-500 mb-1">{calculateReadingTime(paragraph.content)}</div>
               <div className="text-sm text-gray-600 dark:text-gray-400">Min Read</div>
             </div>
             <div className="text-center">
