@@ -27,16 +27,80 @@ export default function RecentParagraphs() {
 
   // Color gradients for categories
   const gradients = [
-    'from-blue-500 to-purple-600',
-    'from-green-500 to-teal-600',
-    'from-pink-500 to-rose-600',
-    'from-orange-500 to-red-600',
-    'from-indigo-500 to-blue-600',
-    'from-yellow-500 to-orange-600',
+    'from-pink-500 to-orange-500',
     'from-purple-500 to-pink-600',
+    'from-lime-400 to-pink-400',
+    'from-blue-600 to-cyan-500',
+    'from-zinc-400 to-zinc-600',
+    'from-pink-300 to-yellow-300',
+    'from-emerald-300 to-blue-400',
+    'from-red-500 to-orange-600',
+    'from-orange-400 to-pink-600',
+    'from-indigo-600 to-purple-600',
+    'from-pink-500 to-rose-600',
+    'from-yellow-300 to-pink-500',
+    'from-gray-800 to-blue-900',
+    'from-pink-300 to-orange-400',
+    'from-emerald-400 to-cyan-400',
+    'from-indigo-500 to-blue-600',
+    'from-stone-400 to-stone-600',
+    'from-cyan-400 to-teal-500',
+    'from-sky-400 to-blue-600',
+    'from-violet-500 to-orange-300',
+    'from-orange-300 to-rose-500',
+    'from-purple-300 to-pink-300',
+    'from-teal-300 to-lime-300',
+    'from-blue-400 to-green-400',
+    'from-orange-500 to-red-600',
+    'from-yellow-400 to-orange-500',
+    'from-pink-400 to-purple-600',
+    'from-fuchsia-600 to-purple-600',
+    'from-neutral-800 to-neutral-600',
+    'from-cyan-300 to-orange-400',
+    'from-gray-500 to-gray-600',
+    'from-indigo-400 to-cyan-400',
+    'from-yellow-300 to-green-300',
+    'from-green-500 to-cyan-500',
+    'from-violet-600 to-cyan-400',
+    'from-violet-500 to-purple-600',
+    'from-yellow-400 to-red-500',
+    'from-red-400 to-orange-400',
+    'from-purple-600 to-indigo-600',
+    'from-cyan-500 to-fuchsia-500',
+    'from-yellow-500 to-orange-600',
+    'from-blue-500 to-purple-600',
+    'from-slate-500 to-blue-600',
+    'from-green-500 to-teal-600',
+    'from-blue-300 to-purple-300',
+    'from-purple-500 to-blue-600',
     'from-teal-500 to-green-600',
-    'from-red-500 to-pink-600',
-    'from-cyan-500 to-blue-600'
+    'from-slate-800 to-slate-600',
+    'from-red-600 to-rose-600',
+    'from-lime-500 to-green-600',
+    'from-amber-400 to-orange-600',
+    'from-red-400 to-yellow-500',
+    'from-stone-900 to-stone-700',
+    'from-sky-300 to-pink-300',
+    'from-blue-300 to-pink-400',
+    'from-green-300 to-purple-400',
+    'from-neutral-500 to-neutral-700',
+    'from-indigo-300 to-pink-300',
+    'from-zinc-900 to-zinc-700',
+    'from-amber-300 to-red-400',
+    'from-amber-500 to-orange-600',
+    'from-pink-500 to-cyan-500',
+    'from-blue-400 to-indigo-600',
+    'from-sky-400 to-emerald-400',
+    'from-rose-300 to-orange-300',
+    'from-rose-500 to-pink-600',
+    'from-green-400 to-teal-500',
+    'from-blue-500 to-violet-600',
+    'from-amber-500 to-pink-600',
+    'from-green-400 to-blue-500',
+    'from-fuchsia-500 to-cyan-500',
+    'from-lime-500 to-cyan-500',
+    'from-green-300 to-blue-300',
+    'from-gray-900 to-gray-700',
   ];
 
   // Function to categorize paragraphs based on content/tags
@@ -182,6 +246,31 @@ export default function RecentParagraphs() {
       </div>
     );
   }
+
+  const handleDelete = async (id: string) => {
+    try {
+      let response = await fetch(`/api/paragraph/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        toast(`Error deleting paragraph: ${response.statusText}`, {
+          description: 'Please try again later.'
+        });
+      }
+
+      const result = await response.json();
+      toast("Success", {
+        description: 'Paragraph deleted successfully!'
+      });
+      setParagraphs(paragraphs.filter(p => p._id?.toString() !== id));
+    } catch (error) {
+      console.error('Error deleting paragraph:', error);
+    }
+  };
 
   return (
     <div className="my-12 px-4">
@@ -335,7 +424,12 @@ export default function RecentParagraphs() {
                     <Edit className="mr-2" />
                     Edit
                   </ContextMenuItem>
-                  <ContextMenuItem className='flex items-center'>
+                  <ContextMenuItem
+                    className='flex items-center'
+                    onClick={() => {
+                      if (paragraph._id) handleDelete(paragraph._id.toString());
+                    }}
+                  >
                     <Trash className="mr-2" />
                     Delete
                   </ContextMenuItem>
