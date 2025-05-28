@@ -10,10 +10,10 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
 import { Edit, Trash } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // Extended interface for display purposes
 interface DisplayParagraph extends IParagraph {
-  id: string;
   category: string;
   gradient: string;
 }
@@ -23,6 +23,7 @@ export default function RecentParagraphs() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   // Color gradients for categories
   const gradients = [
@@ -155,9 +156,6 @@ export default function RecentParagraphs() {
       }
 
       const data = await response.json();
-      console.log("Fetched paragraphs:", data);
-
-      // Transform the data and set state
       const transformedParagraphs = transformParagraphs(data);
       setParagraphs(transformedParagraphs);
     } catch (error) {
@@ -265,11 +263,14 @@ export default function RecentParagraphs() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredParagraphs.map((paragraph) => (
-              <ContextMenu>
+              <ContextMenu key={paragraph.title}>
                 <ContextMenuTrigger>
                   <div
-                    key={paragraph.id}
+                    key={paragraph.title}
                     className="group relative overflow-hidden bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-neutral-700 hover:border-transparent hover:-translate-y-2 cursor-pointer"
+                    onClick={() => {
+                      router.push(`/paragraph/${paragraph._id}`)
+                    }}
                   >
                     {/* Gradient accent bar */}
                     <div className={`h-1.5 bg-gradient-to-r ${paragraph.gradient}`}></div>

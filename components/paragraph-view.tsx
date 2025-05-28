@@ -2,7 +2,9 @@
 
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
+import { Button } from './ui/button';
+import { toast } from 'sonner';
 interface Paragraph {
   id: string;
   title: string;
@@ -53,7 +55,9 @@ export default function ParagraphView({ id }: { id: string }) {
       return paragraph;
     } catch (error) {
       console.error('Error fetching paragraph:', error);
-      throw new Error('Failed to fetch paragraph');
+      toast.error(`Error`, {
+        description: 'Failed to fetch paragraph. Please try again later.'
+      });
     }
   }
 
@@ -103,12 +107,28 @@ export default function ParagraphView({ id }: { id: string }) {
     console.log('Sharing paragraph');
   };
 
-  const handleDelete = () => {
-    // Delete functionality with confirmation
-    if (window.confirm('Are you sure you want to delete this paragraph?')) {
-      // Here you would make an API call to delete the paragraph
-      console.log('Paragraph deleted');
+  const handleDelete = async () => {
+    try {
+      let response = await fetch(`/api/paragraph/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        toast(`Error deleting paragraph: ${response.statusText}`, {
+          description: 'Please try again later.'
+        });
+      }
+
+      const result = await response.json();
+      toast("Success", {
+        description: 'Paragraph deleted successfully!'
+      });
       router.push('/paragraph');
+    } catch (error) {
+      console.error('Error deleting paragraph:', error);
     }
   };
 
@@ -164,7 +184,7 @@ export default function ParagraphView({ id }: { id: string }) {
         <div className="flex justify-center space-x-4 mb-8">
           <button
             onClick={handleEdit}
-            className="flex items-center space-x-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-300 font-medium shadow-lg hover:shadow-xl"
+            className="flex items-center space-x-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-300 font-medium shadow-lg hover:shadow-xl cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -174,7 +194,7 @@ export default function ParagraphView({ id }: { id: string }) {
 
           <button
             onClick={handleShare}
-            className="flex items-center space-x-2 px-6 py-3 bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 text-gray-700 dark:text-gray-300 rounded-xl transition-all duration-300 font-medium border border-gray-300 dark:border-neutral-600"
+            className="flex items-center space-x-2 px-6 py-3 bg-gray-100 dark:bg-neutral-800 hover:bg-gray-200 dark:hover:bg-neutral-700 text-gray-700 dark:text-gray-300 rounded-xl transition-all duration-300 font-medium border border-gray-300 dark:border-neutral-600 cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
@@ -182,15 +202,32 @@ export default function ParagraphView({ id }: { id: string }) {
             <span>Share</span>
           </button>
 
-          <button
-            onClick={handleDelete}
-            className="flex items-center space-x-2 px-6 py-3 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl transition-all duration-300 font-medium border border-red-200 dark:border-red-800"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-            <span>Delete</span>
-          </button>
+          <Dialog>
+            <DialogTrigger>
+              <button
+                className="flex items-center space-x-2 px-6 py-3 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl transition-all duration-300 font-medium border border-red-200 dark:border-red-800 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <span>Delete</span>
+              </button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle className="text-lg font-semibold text-red-600 dark:text-red-400">
+                  Confirm Deletion
+                </DialogTitle>
+                <DialogDescription className="text-gray-600 dark:text-gray-400">
+                  Are you sure you want to delete this paragraph? This action cannot be undone.
+                </DialogDescription>
+              </DialogHeader>
+
+              <Button variant="destructive" onClick={handleDelete} className='cursor-pointer hover:bg-red-700 dark:hover:bg-red-800'>
+                Delete Paragraph
+              </Button>
+            </DialogContent>
+          </Dialog>
         </div>
 
         {/* Main Content Card */}
