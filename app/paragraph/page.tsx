@@ -7,7 +7,6 @@ import {
   ContextMenu,
   ContextMenuContent,
   ContextMenuItem,
-  ContextMenuShortcut,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
 import { Edit, Trash } from 'lucide-react';
