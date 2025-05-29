@@ -141,13 +141,13 @@ export default function AboutPage() {
                 Empowering Every Voice
               </h2>
               <p className="text-lg text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
-                At Eloquence, we believe that exceptional writing is the cornerstone of effective communication.
+                {`At Eloquence, we believe that exceptional writing is the cornerstone of effective communication.
                 Our platform is designed to nurture your natural writing abilities and help you develop the
-                skills needed to express your ideas with clarity, creativity, and confidence.
+                skills needed to express your ideas with clarity, creativity, and confidence.`}
               </p>
               <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">
-                Whether you're crafting your first paragraph or polishing your thousandth, we're here to
-                support your journey toward becoming a more eloquent and impactful writer.
+                {`Whether you're crafting your first paragraph or polishing your thousandth, we're here to
+                support your journey toward becoming a more eloquent and impactful writer.`}
               </p>
             </div>
 
@@ -165,7 +165,7 @@ export default function AboutPage() {
                     <h3 className="text-2xl font-bold">Writing Excellence</h3>
                   </div>
                   <blockquote className="text-lg leading-relaxed italic">
-                    "The pen is mightier than the sword, and at Eloquence, we sharpen that pen until it becomes an instrument of profound expression and lasting impact."
+                    {`"The pen is mightier than the sword, and at Eloquence, we sharpen that pen until it becomes an instrument of profound expression and lasting impact."`}
                   </blockquote>
                 </CardContent>
               </Card>
@@ -235,17 +235,17 @@ export default function AboutPage() {
               Shaping the Future of Writing
             </h2>
             <p className="text-xl lg:text-2xl text-slate-600 dark:text-slate-300 max-w-4xl mx-auto leading-relaxed mb-12">
-              We envision a world where everyone can express their thoughts with clarity and confidence.
-              Eloquence is more than just a writing tool—it's your partner in discovering the power of your own voice.
+              {`We envision a world where everyone can express their thoughts with clarity and confidence.
+              Eloquence is more than just a writing tool—it's your partner in discovering the power of your own voice.`}
             </p>
 
             <Card className="bg-gradient-to-r from-blue-500 to-purple-600 border-0 text-white shadow-2xl max-w-4xl mx-auto">
               <CardContent className="p-12">
                 <blockquote className="text-2xl lg:text-3xl font-medium italic mb-6 leading-relaxed">
-                  "Every great writer was once a beginner. Every expert was once an amateur. Every icon was once unknown."
+                  {`"Every great writer was once a beginner. Every expert was once an amateur. Every icon was once unknown."`}
                 </blockquote>
                 <p className="text-lg opacity-90">
-                  Your writing journey starts here, with Eloquence as your guide.
+                  {`Your writing journey starts here, with Eloquence as your guide.`}
                 </p>
               </CardContent>
             </Card>

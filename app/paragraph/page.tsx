@@ -262,7 +262,7 @@ export default function RecentParagraphs() {
     if (!paragraphToDelete?._id) return;
     
     try {
-      let response = await fetch(`/api/paragraph/${paragraphToDelete._id}`, {
+      const response = await fetch(`/api/paragraph/${paragraphToDelete._id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -276,7 +276,6 @@ export default function RecentParagraphs() {
         return;
       }
 
-      const result = await response.json();
       toast("Success", {
         description: 'Paragraph deleted successfully!'
       });
@@ -470,7 +469,7 @@ export default function RecentParagraphs() {
               Confirm Deletion
             </DialogTitle>
             <DialogDescription className="text-gray-600 dark:text-gray-400">
-              Are you sure you want to delete "{paragraphToDelete?.title}"? This action cannot be undone.
+              {`Are you sure you want to delete "${paragraphToDelete?.title}"? This action cannot be undone.`}
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 justify-end">

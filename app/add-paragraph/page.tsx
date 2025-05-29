@@ -90,7 +90,7 @@ export default function AddParagraph() {
         return;
       }
 
-      let response = await fetch('/api/paragraph', {
+      const response = await fetch('/api/paragraph', {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',

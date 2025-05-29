@@ -176,7 +176,7 @@ export default function ParagraphView({ id }: { id: string }) {
 
   const handleDelete = async () => {
     try {
-      let response = await fetch(`/api/paragraph/${id}`, {
+      const response = await fetch(`/api/paragraph/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -188,8 +188,7 @@ export default function ParagraphView({ id }: { id: string }) {
           description: 'Please try again later.'
         });
       }
-
-      const result = await response.json();
+      
       toast("Success", {
         description: 'Paragraph deleted successfully!'
       });
