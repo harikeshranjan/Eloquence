@@ -1,28 +1,66 @@
 "use client";
 
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { toast } from 'sonner';
+
+interface Paragraph {
+  _id: string;
+  title: string;
+  content: string;
+  tags: string[];
+  createdAt?: string;
+  updatedAt?: string;
+  gradient: string;
+  category?: string;
+}
+
+const gradients = [
+  "from-rose-500 to-pink-500",
+  "from-blue-500 to-indigo-500",
+  "from-emerald-500 to-teal-500"
+];
 
 export default function RecentParagraphs() {
   const router = useRouter();
+  const [paragraphs, setParagraphs] = useState<Paragraph[]>([]);
 
-  const paragraphs = [
-    {
-      title: "Desire",
-      content: "Desire is a powerful force that drives us to pursue our goals and aspirations. It fuels our passion and motivates us to take action. When we have a strong desire for something, we are willing to put in the effort and overcome obstacles to achieve it. Desire can be a positive force that leads to personal growth and fulfillment, but it can also become an obsession if not kept in check.",
-      gradient: "from-rose-500 to-pink-500"
-    },
-    {
-      title: "Ambition",
-      content: "Ambition is the desire to achieve success and reach one's full potential. It is the driving force behind many great accomplishments and innovations. Ambitious individuals are often willing to take risks and work hard to achieve their dreams. However, unchecked ambition can lead to unethical behavior and a disregard for others.",
-      gradient: "from-blue-500 to-indigo-500"
-    },
-    {
-      title: "Perseverance",
-      content: "Perseverance is the ability to keep going despite challenges and setbacks. It is a key trait of successful individuals who refuse to give up in the face of adversity. Perseverance requires resilience, determination, and a positive mindset. Those who persevere often find that their efforts lead to greater rewards and personal satisfaction.",
-      gradient: "from-emerald-500 to-teal-500"
+  const fetchRecentParagraphs = async () => {
+    try {
+      const response = await fetch('/api/paragraph/top-three', {
+        method: "GET",
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+
+      if (!response.ok) {
+        toast("Error", {
+          description: "Failed to fetch recent paragraphs. Please try again later.",
+          duration: 3000,
+        });
+      }
+
+      const paragraphs = await response.json();
+      const formattedParagraphs = paragraphs.map((paragraph: Paragraph, index: number) => {
+        return {
+          ...paragraph,
+          gradient: gradients[index % gradients.length],
+        }
+      })
+      setParagraphs(formattedParagraphs);
+    } catch (error) {
+      console.error("Error fetching recent paragraphs:", error);
+      toast("Error", {
+        description: "Internal server error. Please try again later.",
+        duration: 3000,
+      })
     }
-  ];
+  }
+
+  useEffect(() => {
+    fetchRecentParagraphs()
+  }, []);
 
   return (
     <div className="my-20 px-4">
@@ -37,7 +75,8 @@ export default function RecentParagraphs() {
         {paragraphs.map((paragraph, index) => (
           <div
             key={index}
-            className="group relative overflow-hidden bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-neutral-700 hover:border-transparent hover:-translate-y-2"
+            className="group relative overflow-hidden bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-neutral-700 hover:border-transparent hover:-translate-y-2 cursor-pointer"
+            onClick={() => router.push(`/paragraph/${paragraph._id}`)}
           >
             {/* Gradient accent bar */}
             <div className={`h-1.5 bg-gradient-to-r ${paragraph.gradient}`}></div>
