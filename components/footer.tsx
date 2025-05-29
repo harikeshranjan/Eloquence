@@ -17,9 +17,9 @@ export default function Footer() {
           
           {/* Navigation Links */}
           <div className="flex space-x-8 text-sm text-gray-600 dark:text-gray-400">
-            <a href="#" className="hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">
+            <Link href="/about-us" className="hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">
               About
-            </a>
+            </Link>
             <a href="#" className="hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">
               Privacy
             </a>
