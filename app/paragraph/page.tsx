@@ -368,13 +368,13 @@ export default function RecentParagraphs() {
             <p className="text-gray-600 dark:text-gray-400">No paragraphs found matching your criteria.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 select-none">
             {filteredParagraphs.map((paragraph) => (
               <ContextMenu key={paragraph.title}>
                 <ContextMenuTrigger>
                   <div
                     key={paragraph.title}
-                    className="group relative overflow-hidden bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-neutral-700 hover:border-transparent hover:-translate-y-2 cursor-pointer"
+                    className="group relative overflow-hidden bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-neutral-700 hover:border-transparent hover:-translate-y-2 cursor-pointer select-none"
                     onClick={() => {
                       router.push(`/paragraph/${paragraph._id}`)
                     }}
