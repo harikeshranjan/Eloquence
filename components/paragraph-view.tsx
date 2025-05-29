@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from './ui/button';
 import { toast } from 'sonner';
 interface Paragraph {
-  id: string;
+  _id: string;
   title: string;
   content: string;
   tags: string[];
@@ -15,13 +15,11 @@ interface Paragraph {
   createdAt: string;
   updatedAt: string;
   readingTime?: number;
-  category?: string;
 }
 
 export default function ParagraphView({ id }: { id: string }) {
-  const [isEditing, setIsEditing] = useState(false);
   const [paragraph, setParagraph] = useState<Paragraph>({
-    id: id,
+    _id: id,
     title: 'Sample Paragraph Title',
     content: 'This is a sample paragraph content. It can be multiple lines long and will be displayed in a formatted manner.',
     tags: ['example', 'sample', 'demo'],
@@ -30,7 +28,6 @@ export default function ParagraphView({ id }: { id: string }) {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     readingTime: 2,
-    category: 'General'
   });
   const router = useRouter();
 
@@ -86,9 +83,7 @@ export default function ParagraphView({ id }: { id: string }) {
   };
 
   const handleEdit = () => {
-    setIsEditing(true);
-    router.push(`/paragraph/${paragraph.id}/edit`);
-    console.log('Edit mode activated');
+    router.push(`/paragraph/edit/${paragraph._id}`);
   };
 
   const handleShare = () => {

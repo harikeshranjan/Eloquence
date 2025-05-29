@@ -1,6 +1,11 @@
+"use client";
+
+import { useRouter } from 'next/navigation';
 import React from 'react';
 
 export default function RecentParagraphs() {
+  const router = useRouter();
+
   const paragraphs = [
     {
       title: "Desire",
@@ -36,7 +41,7 @@ export default function RecentParagraphs() {
           >
             {/* Gradient accent bar */}
             <div className={`h-1.5 bg-gradient-to-r ${paragraph.gradient}`}></div>
-            
+
             {/* Card content */}
             <div className="p-6 space-y-4">
               {/* Title with gradient icon */}
@@ -46,12 +51,12 @@ export default function RecentParagraphs() {
                   {paragraph.title}
                 </h2>
               </div>
-              
+
               {/* Content */}
               <p className="text-justify text-sm leading-relaxed text-gray-600 dark:text-gray-300 line-clamp-6">
                 {paragraph.content}
               </p>
-              
+
               {/* Read more button */}
               <div className="pt-2">
                 <button className={`text-sm font-medium bg-gradient-to-r ${paragraph.gradient} bg-clip-text text-transparent hover:opacity-80 transition-opacity duration-200 flex items-center space-x-1`}>
@@ -62,22 +67,25 @@ export default function RecentParagraphs() {
                 </button>
               </div>
             </div>
-            
+
             {/* Subtle background pattern */}
             <div className="absolute inset-0 opacity-5 dark:opacity-10">
               <div className="absolute inset-0 bg-gradient-to-br from-transparent via-gray-100 to-transparent dark:via-neutral-800"></div>
             </div>
-            
+
             {/* Hover effect overlay */}
             <div className={`absolute inset-0 bg-gradient-to-br ${paragraph.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
           </div>
         ))}
       </div>
-      
+
       {/* Load more section */}
       <div className="flex justify-center mt-12">
-        <button className="px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-neutral-800 dark:to-neutral-700 text-gray-700 dark:text-gray-300 rounded-xl hover:from-gray-200 hover:to-gray-300 dark:hover:from-neutral-700 dark:hover:to-neutral-600 transition-all duration-300 font-medium border border-gray-300 dark:border-neutral-600 hover:shadow-lg cursor-pointer">
-          Load More Paragraphs
+        <button
+          className="px-6 py-3 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-neutral-800 dark:to-neutral-700 text-gray-700 dark:text-gray-300 rounded-xl hover:from-gray-200 hover:to-gray-300 dark:hover:from-neutral-700 dark:hover:to-neutral-600 transition-all duration-300 font-medium border border-gray-300 dark:border-neutral-600 hover:shadow-lg cursor-pointer"
+          onClick={() => router.push('/paragraph')}
+        >
+          View All
         </button>
       </div>
     </div>

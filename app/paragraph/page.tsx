@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/context-menu"
 import { Edit, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 
 // Extended interface for display purposes
 interface DisplayParagraph extends IParagraph {
@@ -23,6 +25,8 @@ export default function RecentParagraphs() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [paragraphToDelete, setParagraphToDelete] = useState<DisplayParagraph | null>(null);
   const router = useRouter();
 
   // Color gradients for categories
@@ -247,9 +251,18 @@ export default function RecentParagraphs() {
     );
   }
 
-  const handleDelete = async (id: string) => {
+  const handleDeleteClick = (paragraph: DisplayParagraph, e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent default link behavior
+    e.stopPropagation(); // Prevent triggering the context menu
+    setParagraphToDelete(paragraph);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!paragraphToDelete?._id) return;
+    
     try {
-      let response = await fetch(`/api/paragraph/${id}`, {
+      let response = await fetch(`/api/paragraph/${paragraphToDelete._id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -260,15 +273,21 @@ export default function RecentParagraphs() {
         toast(`Error deleting paragraph: ${response.statusText}`, {
           description: 'Please try again later.'
         });
+        return;
       }
 
       const result = await response.json();
       toast("Success", {
         description: 'Paragraph deleted successfully!'
       });
-      setParagraphs(paragraphs.filter(p => p._id?.toString() !== id));
+      setParagraphs(paragraphs.filter(p => p._id?.toString() !== paragraphToDelete._id?.toString()));
+      setDeleteDialogOpen(false);
+      setParagraphToDelete(null);
     } catch (error) {
       console.error('Error deleting paragraph:', error);
+      toast("Error", {
+        description: 'Failed to delete paragraph. Please try again.'
+      });
     }
   };
 
@@ -420,15 +439,18 @@ export default function RecentParagraphs() {
                   </div>
                 </ContextMenuTrigger>
                 <ContextMenuContent>
-                  <ContextMenuItem className='flex items-center'>
-                    <Edit className="mr-2" />
-                    Edit
-                  </ContextMenuItem>
                   <ContextMenuItem
                     className='flex items-center'
                     onClick={() => {
-                      if (paragraph._id) handleDelete(paragraph._id.toString());
+                      if (paragraph._id) router.push(`/paragraph/edit/${paragraph._id}`);
                     }}
+                  >
+                    <Edit className="mr-2" />
+                    Edit
+                  </ContextMenuItem>
+                  <ContextMenuItem 
+                    className='flex items-center'
+                    onClick={(e) => handleDeleteClick(paragraph, e)}
                   >
                     <Trash className="mr-2" />
                     Delete
@@ -439,6 +461,38 @@ export default function RecentParagraphs() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold text-red-600 dark:text-red-400">
+              Confirm Deletion
+            </DialogTitle>
+            <DialogDescription className="text-gray-600 dark:text-gray-400">
+              Are you sure you want to delete "{paragraphToDelete?.title}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-2 justify-end">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setDeleteDialogOpen(false);
+                setParagraphToDelete(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              className='cursor-pointer hover:bg-red-700 dark:hover:bg-red-800'
+            >
+              Delete Paragraph
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
