@@ -9,6 +9,15 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination"
 import { Edit, Trash } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -26,6 +35,8 @@ export default function RecentParagraphs() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [loading, setLoading] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   const [paragraphToDelete, setParagraphToDelete] = useState<DisplayParagraph | null>(null);
   const router = useRouter();
 
@@ -205,6 +216,11 @@ export default function RecentParagraphs() {
     return matchesSearch && matchesCategory;
   });
 
+  const totalPages = Math.ceil(filteredParagraphs.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedParagraphs = filteredParagraphs.slice(startIndex, endIndex);
+
   const formatDate = (dateString: string | Date) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -239,7 +255,8 @@ export default function RecentParagraphs() {
 
   useEffect(() => {
     fetchParagraphs();
-  }, []);
+    setCurrentPage(1);
+  }, [searchTerm, selectedCategory]);
 
   if (loading) {
     return (
@@ -260,7 +277,7 @@ export default function RecentParagraphs() {
 
   const handleDelete = async () => {
     if (!paragraphToDelete?._id) return;
-    
+
     try {
       const response = await fetch(`/api/paragraph/${paragraphToDelete._id}`, {
         method: 'DELETE',
@@ -368,96 +385,223 @@ export default function RecentParagraphs() {
             <p className="text-gray-600 dark:text-gray-400">No paragraphs found matching your criteria.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 select-none">
-            {filteredParagraphs.map((paragraph) => (
-              <ContextMenu key={paragraph.title}>
-                <ContextMenuTrigger>
-                  <div
-                    key={paragraph.title}
-                    className="group relative overflow-hidden bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-neutral-700 hover:border-transparent hover:-translate-y-2 cursor-pointer select-none"
-                    onClick={() => {
-                      router.push(`/paragraph/${paragraph._id}`)
-                    }}
-                  >
-                    {/* Gradient accent bar */}
-                    <div className={`h-1.5 bg-gradient-to-r ${paragraph.gradient}`}></div>
+          <>
+            {/* Results info */}
+            <div className="mb-6 text-sm text-gray-600 dark:text-gray-400 text-center">
+              Showing {startIndex + 1}-{Math.min(endIndex, filteredParagraphs.length)} of {filteredParagraphs.length} paragraphs
+            </div>
 
-                    {/* Card content */}
-                    <div className="p-6 space-y-4">
-                      {/* Header with category and date */}
-                      <div className="flex justify-between items-start text-xs text-gray-500 dark:text-gray-400">
-                        <span className={`px-2 py-1 rounded-full bg-gradient-to-r ${paragraph.gradient} text-white font-medium`}>
-                          {paragraph.category}
-                        </span>
-                        <span>{formatDate(paragraph.createdAt!)}</span>
-                      </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 select-none mb-8">
+              {paginatedParagraphs.map((paragraph) => (
+                <ContextMenu key={paragraph.title}>
+                  <ContextMenuTrigger>
+                    <div
+                      key={paragraph.title}
+                      className="group relative overflow-hidden bg-white dark:bg-neutral-900 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 dark:border-neutral-700 hover:border-transparent hover:-translate-y-2 cursor-pointer select-none"
+                      onClick={() => {
+                        router.push(`/paragraph/${paragraph._id}`)
+                      }}
+                    >
+                      {/* Gradient accent bar */}
+                      <div className={`h-1.5 bg-gradient-to-r ${paragraph.gradient}`}></div>
 
-                      {/* Title */}
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${paragraph.gradient} shadow-lg`}></div>
-                        <h2 className="text-xl font-bold text-gray-800 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-gray-800 group-hover:to-gray-600 dark:group-hover:from-white dark:group-hover:to-gray-300 group-hover:bg-clip-text transition-all duration-300">
-                          {paragraph.title}
-                        </h2>
-                      </div>
-
-                      {/* Content */}
-                      <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300 line-clamp-4">
-                        {paragraph.content}
-                      </p>
-
-                      {/* Tags */}
-                      {paragraph.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {paragraph.tags.slice(0, 3).map((tag, index) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 text-xs bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 rounded-md"
-                            >
-                              #{tag}
-                            </span>
-                          ))}
-                          {paragraph.tags.length > 3 && (
-                            <span className="px-2 py-1 text-xs bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 rounded-md">
-                              +{paragraph.tags.length - 3} more
-                            </span>
-                          )}
+                      {/* Card content */}
+                      <div className="p-6 space-y-4">
+                        {/* Header with category and date */}
+                        <div className="flex justify-between items-start text-xs text-gray-500 dark:text-gray-400">
+                          <span className={`px-2 py-1 rounded-full bg-gradient-to-r ${paragraph.gradient} text-white font-medium`}>
+                            {paragraph.category}
+                          </span>
+                          <span>{formatDate(paragraph.createdAt!)}</span>
                         </div>
-                      )}
 
-                      {/* Footer with word count and read more */}
-                      <div className="flex justify-between items-center pt-2">
-                        <span className="text-xs text-gray-400">{paragraph.wordCount} words</span>
-                        <button className={`text-sm font-medium bg-gradient-to-r ${paragraph.gradient} bg-clip-text text-transparent hover:opacity-80 transition-opacity duration-200 flex items-center space-x-1`}>
-                          <span>Read more</span>
-                        </button>
+                        {/* Title */}
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${paragraph.gradient} shadow-lg`}></div>
+                          <h2 className="text-xl font-bold text-gray-800 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-gray-800 group-hover:to-gray-600 dark:group-hover:from-white dark:group-hover:to-gray-300 group-hover:bg-clip-text transition-all duration-300">
+                            {paragraph.title}
+                          </h2>
+                        </div>
+
+                        {/* Content */}
+                        <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300 line-clamp-4">
+                          {paragraph.content}
+                        </p>
+
+                        {/* Tags */}
+                        {paragraph.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {paragraph.tags.slice(0, 3).map((tag, index) => (
+                              <span
+                                key={index}
+                                className="px-2 py-1 text-xs bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 rounded-md"
+                              >
+                                #{tag}
+                              </span>
+                            ))}
+                            {paragraph.tags.length > 3 && (
+                              <span className="px-2 py-1 text-xs bg-gray-100 dark:bg-neutral-800 text-gray-600 dark:text-gray-400 rounded-md">
+                                +{paragraph.tags.length - 3} more
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Footer with word count and read more */}
+                        <div className="flex justify-between items-center pt-2">
+                          <span className="text-xs text-gray-400">{paragraph.wordCount} words</span>
+                          <button className={`text-sm font-medium bg-gradient-to-r ${paragraph.gradient} bg-clip-text text-transparent hover:opacity-80 transition-opacity duration-200 flex items-center space-x-1`}>
+                            <span>Read more</span>
+                          </button>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Hover effect overlay */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${paragraph.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
-                  </div>
-                </ContextMenuTrigger>
-                <ContextMenuContent>
-                  <ContextMenuItem
-                    className='flex items-center'
-                    onClick={() => {
-                      if (paragraph._id) router.push(`/paragraph/edit/${paragraph._id}`);
-                    }}
-                  >
-                    <Edit className="mr-2" />
-                    Edit
-                  </ContextMenuItem>
-                  <ContextMenuItem 
-                    className='flex items-center'
-                    onClick={(e) => handleDeleteClick(paragraph, e)}
-                  >
-                    <Trash className="mr-2" />
-                    Delete
-                  </ContextMenuItem>
-                </ContextMenuContent>
-              </ContextMenu>
-            ))}
-          </div>
+                      {/* Hover effect overlay */}
+                      <div className={`absolute inset-0 bg-gradient-to-br ${paragraph.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
+                    </div>
+                  </ContextMenuTrigger>
+                  <ContextMenuContent>
+                    <ContextMenuItem
+                      className='flex items-center'
+                      onClick={() => {
+                        if (paragraph._id) router.push(`/paragraph/edit/${paragraph._id}`);
+                      }}
+                    >
+                      <Edit className="mr-2" />
+                      Edit
+                    </ContextMenuItem>
+                    <ContextMenuItem
+                      className='flex items-center'
+                      onClick={(e) => handleDeleteClick(paragraph, e)}
+                    >
+                      <Trash className="mr-2" />
+                      Delete
+                    </ContextMenuItem>
+                  </ContextMenuContent>
+                </ContextMenu>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (currentPage > 1) setCurrentPage(currentPage - 1);
+                        }}
+                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+
+                    {/* First page */}
+                    {currentPage > 2 && (
+                      <PaginationItem>
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(1);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          1
+                        </PaginationLink>
+                      </PaginationItem>
+                    )}
+
+                    {/* Ellipsis before current page */}
+                    {currentPage > 3 && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+
+                    {/* Previous page */}
+                    {currentPage > 1 && (
+                      <PaginationItem>
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(currentPage - 1);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          {currentPage - 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )}
+
+                    {/* Current page */}
+                    <PaginationItem>
+                      <PaginationLink
+                        href="#"
+                        isActive
+                        className="cursor-pointer"
+                      >
+                        {currentPage}
+                      </PaginationLink>
+                    </PaginationItem>
+
+                    {/* Next page */}
+                    {currentPage < totalPages && (
+                      <PaginationItem>
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(currentPage + 1);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          {currentPage + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )}
+
+                    {/* Ellipsis after current page */}
+                    {currentPage < totalPages - 2 && (
+                      <PaginationItem>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    )}
+
+                    {/* Last page */}
+                    {currentPage < totalPages - 1 && (
+                      <PaginationItem>
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage(totalPages);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          {totalPages}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )}
+
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+                        }}
+                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -473,8 +617,8 @@ export default function RecentParagraphs() {
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 justify-end">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={() => {
                 setDeleteDialogOpen(false);
                 setParagraphToDelete(null);
