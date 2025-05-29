@@ -1,4 +1,4 @@
-import ParagraphEdit from '@/components/ParagraphEdit';
+import ParagraphEdit from '@/components/paragraph-edit';
 import React from 'react';
 
 interface PageProps {

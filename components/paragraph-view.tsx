@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Button } from './ui/button';
 import { toast } from 'sonner';
+
 interface Paragraph {
   _id: string;
   title: string;
@@ -17,22 +18,91 @@ interface Paragraph {
   readingTime?: number;
 }
 
+// Beautiful Loading Component
+const ParagraphLoader = () => {
+  return (
+    <div className="min-h-screen px-4 flex items-center justify-center">
+      <div className="max-w-4xl mx-auto w-full">
+        {/* Animated Loading Header */}
+        <div className="text-center mb-12">
+          <div className="h-12 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 rounded-lg mb-6 animate-pulse"></div>
+          <div className="flex justify-center space-x-6 mb-6">
+            <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-4 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+          </div>
+          <div className="w-24 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mx-auto animate-pulse"></div>
+        </div>
+
+        {/* Loading Spinner with Text */}
+        <div className="text-center mb-8">
+          <div className="relative inline-flex items-center justify-center">
+            {/* Outer spinning ring */}
+            <div className="w-16 h-16 border-4 border-emerald-200 dark:border-emerald-800 border-t-emerald-500 rounded-full animate-spin"></div>
+            {/* Inner pulsing dot */}
+            <div className="absolute w-4 h-4 bg-emerald-500 rounded-full animate-pulse"></div>
+          </div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium animate-pulse">
+            Loading your paragraph...
+          </p>
+        </div>
+
+        {/* Skeleton Action Buttons */}
+        <div className="flex justify-center space-x-4 mb-8">
+          <div className="h-12 w-24 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse"></div>
+          <div className="h-12 w-24 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse"></div>
+          <div className="h-12 w-24 bg-gray-200 dark:bg-gray-700 rounded-xl animate-pulse"></div>
+        </div>
+
+        {/* Skeleton Content Card */}
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-gray-200 dark:border-neutral-700 overflow-hidden mb-8">
+          <div className="h-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 animate-pulse"></div>
+          <div className="p-8 md:p-12 space-y-4">
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-5/6"></div>
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-4/6"></div>
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4"></div>
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-5/6"></div>
+            <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-2/3"></div>
+          </div>
+        </div>
+
+        {/* Skeleton Tags */}
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg border border-gray-200 dark:border-neutral-700 p-6 mb-8">
+          <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
+          <div className="flex flex-wrap gap-3">
+            <div className="h-8 w-16 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+            <div className="h-8 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+            <div className="h-8 w-24 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse"></div>
+          </div>
+        </div>
+
+        {/* Skeleton Statistics */}
+        <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-lg border border-gray-200 dark:border-neutral-700 p-6">
+          <div className="h-6 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4"></div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="text-center">
+                <div className="h-8 w-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto mb-2"></div>
+                <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function ParagraphView({ id }: { id: string }) {
-  const [paragraph, setParagraph] = useState<Paragraph>({
-    _id: id,
-    title: 'Sample Paragraph Title',
-    content: 'This is a sample paragraph content. It can be multiple lines long and will be displayed in a formatted manner.',
-    tags: ['example', 'sample', 'demo'],
-    wordCount: 50,
-    charCount: 300,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    readingTime: 2,
-  });
+  const [paragraph, setParagraph] = useState<Paragraph | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
 
   async function getParagraph(id: string) {
     try {
+      setLoading(true);
+
       const response = await fetch(`/api/paragraph/${id}`, {
         method: 'GET',
         headers: {
@@ -55,6 +125,8 @@ export default function ParagraphView({ id }: { id: string }) {
       toast.error(`Error`, {
         description: 'Failed to fetch paragraph. Please try again later.'
       });
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -69,7 +141,7 @@ export default function ParagraphView({ id }: { id: string }) {
     };
 
     fetchParagraph();
-  }, []);
+  }, [id]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -83,15 +155,15 @@ export default function ParagraphView({ id }: { id: string }) {
   };
 
   const handleEdit = () => {
-    router.push(`/paragraph/edit/${paragraph._id}`);
+    router.push(`/paragraph/edit/${paragraph?._id}`);
   };
 
   const handleShare = () => {
     // Share functionality
     if (navigator.share) {
       navigator.share({
-        title: paragraph.title,
-        text: paragraph.content.substring(0, 100) + '...',
+        title: paragraph?.title,
+        text: paragraph?.content.substring(0, 100) + '...',
         url: window.location.href,
       });
     } else {
@@ -135,7 +207,12 @@ export default function ParagraphView({ id }: { id: string }) {
     const wordCount = content.trim().split(/\s+/).length;
     const time = Math.ceil(wordCount / 200);
 
-    return time > 0 ? "< 1 min" : `${time} min`;
+    return time <= 1 ? "< 1 min" : `${time} min`;
+  }
+
+  // Show loader while loading or paragraph is null
+  if (loading || !paragraph) {
+    return <ParagraphLoader />;
   }
 
   return (
@@ -156,7 +233,6 @@ export default function ParagraphView({ id }: { id: string }) {
               <span>
                 {calculateReadingTime(paragraph.content)}
               </span>
-
             </div>
             <div className="flex items-center space-x-2">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
