@@ -11,8 +11,6 @@ import {
   UserCheck, 
   Globe, 
   RefreshCw,
-  ChevronRight,
-  Heart,
   Sparkles,
   CheckCircle,
   Mail,
