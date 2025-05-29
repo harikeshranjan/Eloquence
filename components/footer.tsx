@@ -20,15 +20,15 @@ export default function Footer() {
             <Link href="/about-us" className="hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">
               About
             </Link>
-            <a href="#" className="hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">
+            <Link href="/privacy" className="hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">
               Privacy
-            </a>
-            <a href="#" className="hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">
+            </Link>
+            <Link href="/terms" className="hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">
               Terms
-            </a>
-            <a href="#" className="hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">
+            </Link>
+            <Link href="https://github.com/Harikesh-14/" className="hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200">
               Contact
-            </a>
+            </Link>
           </div>
         </div>
         
